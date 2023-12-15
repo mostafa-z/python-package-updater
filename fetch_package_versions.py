@@ -1,4 +1,6 @@
 import requests
+from tabulate import tabulate
+from pkg_resources import get_distribution, DistributionNotFound
 
 def get_package_info(package_name):
     url = f"https://pypi.org/pypi/{package_name}/json"
@@ -6,13 +8,22 @@ def get_package_info(package_name):
     if response.status_code == 200:
         package_data = response.json()
         latest_version = package_data["info"]["version"]
-        return package_name, latest_version
+        return latest_version
     else:
-        return package_name, "Not found"
+        return "Not found"
 
 with open('packages.txt', 'r') as file:
     package_list = [line.strip() for line in file.readlines()]
 
+data = []
 for package in package_list:
-    package_name, latest_version = get_package_info(package)
-    print(f"{package_name}: Latest version - {latest_version}")
+    try:
+        installed_version = get_distribution(package).version
+    except DistributionNotFound:
+        installed_version = "Not installed"
+
+    latest_version = get_package_info(package)
+    data.append([package, installed_version, latest_version])
+
+headers = ["Package", "Installed Version", "Latest Version"]
+print(tabulate(data, headers=headers, tablefmt="github"))

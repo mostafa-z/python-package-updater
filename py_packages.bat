@@ -7,6 +7,20 @@ if errorlevel 1 (
     python -m pip install requests
 )
 
+rem Check if tabulate library is installed
+python -c "import tabulate" 2>nul
+if errorlevel 1 (
+    echo Installing tabulate library...
+    python -m pip install tabulate
+)
+
+rem Check if pkg_resources library is installed
+python -c "import pkg_resources " 2>nul
+if errorlevel 1 (
+    echo Installing pkg_resources library...
+    python -m pip install pkg_resources
+)
+
 rem Your Python script to fetch latest package versions
 echo Fetching latest package versions...
 python fetch_package_versions.py
