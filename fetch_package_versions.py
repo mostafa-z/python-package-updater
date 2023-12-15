@@ -1,6 +1,6 @@
+import subprocess
 import requests
 from tabulate import tabulate
-from pkg_resources import get_distribution, DistributionNotFound
 
 def get_package_info(package_name):
     url = f"https://pypi.org/pypi/{package_name}/json"
@@ -19,8 +19,15 @@ data = []
 outdated_packages = False
 for package in package_list:
     try:
-        installed_version = get_distribution(package).version
-    except DistributionNotFound:
+        result = subprocess.run(['python', '-m', 'pip', 'show', '--no-color', package], capture_output=True, text=True)
+        package_info = {}
+        for line in result.stdout.splitlines():
+            parts = line.split(': ', 1)
+            if len(parts) == 2:
+                key, value = parts
+                package_info[key] = value
+        installed_version = package_info.get('Version', 'Not installed')
+    except subprocess.CalledProcessError:
         installed_version = "Not installed"
 
     latest_version = get_package_info(package)
