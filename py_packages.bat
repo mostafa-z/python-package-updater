@@ -1,5 +1,19 @@
 @echo off
 
+rem Show installed Python version
+python --version
+
+rem Show installed pip version in a simpler format
+for /f "tokens=2 delims=: " %%v in ('python -m pip show pip ^| findstr /i "version"') do echo Installed pip version: %%v
+
+rem Check for updates for pip
+python -m pip install --upgrade pip > nul
+if %errorlevel% equ 0 (
+    echo Pip is up to date or has been updated successfully.
+) else (
+    echo Pip update failed or was not needed.
+)
+
 rem Check if requests library is installed
 python -c "import requests" 2>nul
 if errorlevel 1 (
@@ -21,35 +35,33 @@ if errorlevel 1 (
     python -m pip install pkg_resources
 )
 
+rem Check if subprocess library is installed
+rem python -c "import subprocess " 2>nul
+rem if errorlevel 1 (
+rem     echo Installing subprocess library...
+rem     python -m pip install subprocess
+rem )
+
 rem Your Python script to fetch latest package versions
 echo Fetching latest package versions...
 python fetch_package_versions.py
 
-python --version
-echo Checking for updates...
-python.exe -m pip install --upgrade pip
-
 rem Check the exit code of the pip update command
 if %errorlevel% equ 0 (
-    echo Pip is up to date or has been updated successfully.
-    echo Updating other packages...
-
-
-	rem Read the package list from packages.txt
-	rem Iterate through the list of packages and check/update them
-	for /f %%P in (packages.txt) do (
-		pip show %%P >nul
-		if %errorlevel% neq 0 (
-			echo Installing %%P...
-			pip install %%P
-		) else (
-			echo Updating %%P...
-			pip install --upgrade %%P
-		)
-	)
+    rem Check if packages_to_update.txt exists
+    if exist packages_to_update.txt (
+        rem Read the package list from packages_to_update.txt
+        rem Iterate through the list of packages and update them
+        for /f %%P in (packages_to_update.txt) do (
+            pip install --upgrade %%P
+        )
+        del packages_to_update.txt
+        echo Packages updated successfully!
+    ) else (
+        echo No packages need updating.
+    )
 ) else (
     echo Pip update failed or was not needed.
 )
 
-echo Installation complete.
 pause
