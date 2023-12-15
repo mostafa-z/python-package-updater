@@ -10,7 +10,8 @@ def get_package_info(package_name):
     else:
         return package_name, "Not found"
 
-package_list = ["pynput", "opencv-python", "pyautogui", "pillow", "sounddevice", "scipy"]
+with open('packages.txt', 'r') as file:
+    package_list = [line.strip() for line in file.readlines()]
 
 for package in package_list:
     package_name, latest_version = get_package_info(package)
