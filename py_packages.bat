@@ -1,6 +1,17 @@
 @echo off
 set PACKAGE_LIST=pynput opencv-python pyautogui pillow sounddevice scipy
 
+rem Check if requests library is installed
+python -c "import requests" 2>nul
+if errorlevel 1 (
+    echo Installing requests library...
+    python -m pip install requests
+)
+
+rem Your Python script to fetch latest package versions
+echo Fetching latest package versions...
+python fetch_package_versions.py
+
 python --version
 echo Checking for updates...
 python.exe -m pip install --upgrade pip
