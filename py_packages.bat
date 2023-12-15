@@ -14,32 +14,15 @@ if %errorlevel% equ 0 (
     echo Pip update failed or was not needed.
 )
 
-rem Check if requests library is installed
-python -c "import requests" 2>nul
-if errorlevel 1 (
-    echo Installing requests library...
-    python -m pip install requests
-)
+rem Define the required Python libraries
+set "libraries=requests tabulate pkg_resources subprocess"
 
-rem Check if tabulate library is installed
-python -c "import tabulate" 2>nul
-if errorlevel 1 (
-    echo Installing tabulate library...
-    python -m pip install tabulate
-)
-
-rem Check if pkg_resources library is installed
-python -c "import pkg_resources " 2>nul
-if errorlevel 1 (
-    echo Installing pkg_resources library...
-    python -m pip install pkg_resources
-)
-
-rem Check if subprocess library is installed
-python -c "import subprocess " 2>nul
-if errorlevel 1 (
-    echo Installing subprocess library...
-    python -m pip install subprocess
+rem Loop through each library and check/install if needed
+for %%l in (%libraries%) do (
+    python -c "import %%l" 2>nul || (
+        echo Installing %%l library...
+        python -m pip install %%l
+    )
 )
 
 :menu
