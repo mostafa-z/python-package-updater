@@ -36,12 +36,27 @@ if errorlevel 1 (
 )
 
 rem Check if subprocess library is installed
-rem python -c "import subprocess " 2>nul
-rem if errorlevel 1 (
-rem     echo Installing subprocess library...
-rem     python -m pip install subprocess
-rem )
+python -c "import subprocess " 2>nul
+if errorlevel 1 (
+    echo Installing subprocess library...
+    python -m pip install subprocess
+)
 
+:menu
+echo Menu:
+echo 1. Run version check
+echo 2. Update all installed packages (even those not listed)
+echo 3. Exit
+set /p choice="Enter your choice: "
+
+if "%choice%"=="1" goto version_check
+if "%choice%"=="2" goto update_all
+if "%choice%"=="3" goto :eof
+
+echo Invalid choice. Please try again.
+goto menu
+
+:version_check
 rem Your Python script to fetch latest package versions
 echo Fetching latest package versions...
 python fetch_package_versions.py
@@ -65,3 +80,11 @@ if %errorlevel% equ 0 (
 )
 
 pause
+goto menu
+
+:update_all
+echo Fetching list of outdated packages...
+python upgrade_packages.py
+
+pause
+goto menu
